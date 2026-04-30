@@ -23,6 +23,8 @@ if (!command || command === 'help' || command === '--help' || command === '-h') 
 
 if (command === 'init') {
   await initProject(args.slice(1));
+} else if (command === 'retrofit') {
+  await retrofitProject(args.slice(1));
 } else if (command === 'version' || command === '--version' || command === '-v') {
   const packageJson = JSON.parse(await readFile(path.join(rootDir, 'package.json'), 'utf8'));
   console.log(packageJson.version);
@@ -30,6 +32,50 @@ if (command === 'init') {
   console.error(`Unknown command: ${command}`);
   printHelp();
   process.exit(1);
+}
+
+async function retrofitProject(rawArgs) {
+  const options = parseArgs(rawArgs);
+  const interactive = !options.yes && process.stdin.isTTY;
+  const rl = interactive ? readline.createInterface({ input: process.stdin, output: process.stdout }) : null;
+
+  try {
+    const targetDir = process.cwd();
+    const projectName = options.name || path.basename(targetDir);
+    const agents = normalizeAgents(options.agents || options.agent || 'codex');
+    const values = {
+      projectName,
+      projectSlug: slugify(projectName) || projectName,
+      projectDescription: options.description || `Retrofitted Sonata harness for ${projectName}`,
+      projectKind: options.kind || 'existing project',
+      stack: options.stack || 'unknown',
+      packageManager: options.packageManager || 'unknown',
+      firstMilestone: options.milestone || 'Normalize existing project into Sonata harness',
+      cavemanMode: options.cavemanMode || 'full',
+      agentTargets: agents.map((agent) => labelForAgent(agent)).join(', '),
+      primaryAgent: labelForAgent(agents[0] || 'codex'),
+      createdAt: new Date().toISOString().slice(0, 10)
+    };
+
+    const conflicts = await collectExistingTemplateFiles(templateDir, targetDir, agents);
+    const overwrite = options.force || await confirmOverwrite(rl, conflicts);
+
+    await copyTemplate(templateDir, targetDir, values, {
+      agents,
+      overwrite
+    });
+    await chmod(path.join(targetDir, 'scripts', 'check-sonata.sh'), 0o755);
+
+    if (conflicts.length && !overwrite) {
+      console.log(`Preserved ${conflicts.length} existing file(s). Use --force to overwrite Sonata-managed files.`);
+    }
+
+    console.log('Retrofitted current project');
+    console.log(`Agents: ${values.agentTargets}`);
+    console.log('Check: ./scripts/check-sonata.sh');
+  } finally {
+    rl?.close();
+  }
 }
 
 async function initProject(rawArgs) {
@@ -187,6 +233,57 @@ function labelForAgent(agentId) {
   return agentChoices.find((agent) => agent.id === agentId)?.label || agentId;
 }
 
+async function collectExistingTemplateFiles(sourceDir, targetDir, agents) {
+  const files = [];
+  await collectExistingTemplateFilesInDir(sourceDir, sourceDir, targetDir, agents, files);
+  return files;
+}
+
+async function collectExistingTemplateFilesInDir(sourceRoot, currentSourceDir, currentTargetDir, agents, files) {
+  const entries = await readdir(currentSourceDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.name === '.DS_Store') {
+      continue;
+    }
+
+    const sourcePath = path.join(currentSourceDir, entry.name);
+    const relativeSourcePath = path.relative(sourceRoot, sourcePath);
+
+    if (shouldSkipAgentFile(relativeSourcePath, agents)) {
+      continue;
+    }
+
+    const targetName = entry.name === '_gitignore' ? '.gitignore' : entry.name;
+    const targetPath = path.join(currentTargetDir, targetName);
+
+    if (entry.isDirectory()) {
+      await collectExistingTemplateFilesInDir(sourceRoot, sourcePath, targetPath, agents, files);
+    } else if (await exists(targetPath)) {
+      files.push(path.relative(process.cwd(), targetPath) || path.basename(targetPath));
+    }
+  }
+}
+
+async function confirmOverwrite(rl, conflicts) {
+  if (!conflicts.length) {
+    return false;
+  }
+
+  if (!rl) {
+    return false;
+  }
+
+  console.log('Existing files would be overwritten if allowed:');
+  conflicts.slice(0, 20).forEach((file) => console.log(`  ${file}`));
+  if (conflicts.length > 20) {
+    console.log(`  ...and ${conflicts.length - 20} more`);
+  }
+
+  const answer = await rl.question('Danger: overwrite these files? Type "overwrite" to replace, Enter to preserve: ');
+  return answer.trim().toLowerCase() === 'overwrite';
+}
+
 async function copyTemplate(sourceDir, targetDir, values, options) {
   await renderDirectory(sourceDir, sourceDir, targetDir, values, options);
 }
@@ -270,6 +367,7 @@ function printHelp() {
 
 Usage:
   sonata init [project-name] [options]
+  sonata retrofit [options]
 
 Options:
   --description <text>       Project intent
@@ -279,13 +377,12 @@ Options:
   --milestone <text>         First useful milestone
   --caveman-mode <mode>      lite, full, ultra, wenyan-lite, wenyan-full, wenyan-ultra
   --agents <list>            codex, copilot, claude, or all. Codex always included
-  --retrofit                 Merge missing harness files into an existing directory without overwriting files
   --yes, -y                  Use defaults for missing values
   --force, -f                Overwrite template-managed files in an existing directory
 
 Examples:
   bunx github:gisketch/sonata init
   bunx github:gisketch/sonata init trade-mod
-  bunx github:gisketch/sonata init . --retrofit
+  bunx github:gisketch/sonata retrofit
   bunx github:gisketch/sonata init trade-mod --agents all`);
 }

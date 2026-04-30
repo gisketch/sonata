@@ -28,7 +28,7 @@ Retrofit an existing project without overwriting existing files:
 
 ```bash
 cd existing-project
-bunx github:gisketch/sonata init . --retrofit
+bunx github:gisketch/sonata retrofit
 ```
 
 Local development:
@@ -158,7 +158,7 @@ Expected result:
 
 ```bash
 cd existing-mod
-bunx github:gisketch/sonata init . --retrofit --agents all
+bunx github:gisketch/sonata retrofit --agents all
 ./scripts/check-sonata.sh
 ```
 
