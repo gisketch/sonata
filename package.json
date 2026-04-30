@@ -1,0 +1,32 @@
+{
+  "name": "sonata",
+  "version": "0.1.0",
+  "description": "Token-efficient agent harness starter for generating project skeletons with local skills and repo knowledge.",
+  "type": "module",
+  "bin": {
+    "sonata": "./bin/sonata.js"
+  },
+  "files": [
+    "bin/",
+    "templates/",
+    "README.md",
+    "AGENTS.md",
+    "docs/"
+  ],
+  "scripts": {
+    "check": "node --check bin/sonata.js && bash scripts/check-harness.sh",
+    "smoke:init": "rm -rf .tmp-sonata-smoke .tmp-sonata-all .tmp-sonata-retrofit && node bin/sonata.js init .tmp-sonata-smoke --yes --description \"Smoke test project\" --kind \"generic app\" --stack \"Node\" --milestone \"Validate generated harness\" && bash .tmp-sonata-smoke/scripts/check-sonata.sh && test -f .tmp-sonata-smoke/.codex/prompts/retrofit-sonata.md && test -f .tmp-sonata-smoke/.github/skills/retrofit-sonata/SKILL.md && node bin/sonata.js init .tmp-sonata-all --yes --agents all --description \"All-agent smoke project\" --kind \"generic app\" --stack \"Node\" --milestone \"Validate all agent files\" && bash .tmp-sonata-all/scripts/check-sonata.sh && test -f .tmp-sonata-all/.github/copilot-instructions.md && test -f .tmp-sonata-all/CLAUDE.md && test -f .tmp-sonata-all/.claude/skills/retrofit-sonata/SKILL.md && mkdir .tmp-sonata-retrofit && printf 'existing readme\n' > .tmp-sonata-retrofit/README.md && cd .tmp-sonata-retrofit && node ../bin/sonata.js init . --retrofit --yes --description \"Retrofit smoke project\" --kind \"existing app\" --stack \"Unknown\" --milestone \"Normalize harness\" && grep -q 'existing readme' README.md && bash scripts/check-sonata.sh && cd .. && rm -rf .tmp-sonata-smoke .tmp-sonata-all .tmp-sonata-retrofit"
+  },
+  "keywords": [
+    "agent",
+    "harness",
+    "starter-kit",
+    "copilot",
+    "caveman",
+    "token-efficient"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
