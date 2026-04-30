@@ -8,6 +8,8 @@ Enabled agents: {{agentTargets}}
 
 Codex is the default path. It should read [AGENTS.md](../AGENTS.md), then follow only the links needed for the current task.
 
+Local Codex skills live in `.codex/skills/<name>/SKILL.md`. These should appear in Codex CLI's skill picker after starting or refreshing a session in the project root.
+
 Use these task labels in prompts:
 
 - `init-sonata:` to convert rough intent into repo context.

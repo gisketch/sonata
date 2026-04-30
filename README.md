@@ -41,7 +41,7 @@ npm run check
 ## What This Gives You
 
 - `sonata init`: interactive project generator.
-- Codex-first setup: generated `AGENTS.md` and `.codex/prompts/` are always present.
+- Codex-first setup: generated `AGENTS.md`, `.codex/skills/`, and `.codex/prompts/` are always present.
 - Optional compatibility: Copilot instructions and Claude Code skill files when selected.
 - Generated `AGENTS.md`: short table of contents for agents.
 - Generated `docs/`: project memory, architecture, quality, plans, and references.
@@ -96,6 +96,7 @@ When an agent struggles, do not only retry the prompt. Add the missing map, rule
 - `/retrofit-sonata`: inventory an existing project, preserve useful docs, and normalize it into the harness standard.
 - `/caveman-sonata`: do implementation with terse progress, explicit acceptance, and validation.
 - `init-sonata:`, `retrofit-sonata:`, and `caveman-sonata:` prompt labels are included for Codex-oriented workflows.
+- Codex skill picker entries come from `.codex/skills/<name>/SKILL.md`.
 - `docs/quality.md`: always list the real checks for the generated project.
 - `docs/exec-plans/active/`: use for larger features and architecture decisions.
 
