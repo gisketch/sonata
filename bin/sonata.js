@@ -25,6 +25,8 @@ if (command === 'init') {
   await initProject(args.slice(1));
 } else if (command === 'retrofit') {
   await retrofitProject(args.slice(1));
+} else if (command === 'update') {
+  await updateProject(args.slice(1));
 } else if (command === 'version' || command === '--version' || command === '-v') {
   const packageJson = JSON.parse(await readFile(path.join(rootDir, 'package.json'), 'utf8'));
   console.log(packageJson.version);
@@ -76,6 +78,88 @@ async function retrofitProject(rawArgs) {
   } finally {
     rl?.close();
   }
+}
+
+async function updateProject(rawArgs) {
+  const options = parseArgs(rawArgs);
+
+  if (options.force) {
+    throw new Error('sonata update never overwrites files. Use retrofit --force only when replacement is intentional.');
+  }
+
+  const targetDir = process.cwd();
+  if (!await isLikelySonataProject(targetDir)) {
+    throw new Error('sonata update only runs inside an existing Sonata project. Use retrofit for non-Sonata projects.');
+  }
+
+  const agents = await detectAgents(targetDir, options.agents || options.agent);
+  const values = await buildExistingProjectValues(targetDir, options, agents);
+  const result = await copyTemplate(templateDir, targetDir, values, {
+    agents,
+    overwrite: false
+  });
+  const checkScript = path.join(targetDir, 'scripts', 'check-sonata.sh');
+
+  if (await exists(checkScript)) {
+    await chmod(checkScript, 0o755);
+  }
+
+  console.log('Updated current project');
+  console.log(`Added: ${result.written} file(s)`);
+  console.log(`Preserved: ${result.skipped} existing file(s)`);
+  console.log(`Agents: ${values.agentTargets}`);
+  console.log('Check: ./scripts/check-sonata.sh');
+}
+
+async function isLikelySonataProject(targetDir) {
+  return await exists(path.join(targetDir, 'scripts', 'check-sonata.sh')) ||
+    await exists(path.join(targetDir, '.codex', 'skills', 'init-sonata', 'SKILL.md')) ||
+    (await readIfExists(path.join(targetDir, 'AGENTS.md'))).includes('Sonata');
+}
+
+async function detectAgents(targetDir, value) {
+  if (typeof value === 'string' && value.trim()) {
+    return normalizeAgents(value);
+  }
+
+  const detected = ['codex'];
+
+  if (await exists(path.join(targetDir, '.github', 'copilot-instructions.md'))) detected.push('copilot');
+  if (await exists(path.join(targetDir, 'CLAUDE.md')) || await exists(path.join(targetDir, '.claude'))) detected.push('claude');
+
+  return normalizeAgents(detected.join(','));
+}
+
+async function buildExistingProjectValues(targetDir, options, agents) {
+  const facts = await readGeneratedFacts(targetDir);
+  const projectName = options.name || facts.projectName || path.basename(targetDir);
+
+  return {
+    projectName,
+    projectSlug: slugify(projectName) || projectName,
+    projectDescription: options.description || `Updated Sonata harness for ${projectName}`,
+    projectKind: options.kind || facts.projectKind || 'existing project',
+    stack: options.stack || facts.stack || 'unknown',
+    packageManager: options.packageManager || facts.packageManager || 'unknown',
+    firstMilestone: options.milestone || 'Keep Sonata harness current without overwriting project work',
+    cavemanMode: options.cavemanMode || facts.cavemanMode || 'full',
+    agentTargets: agents.map((agent) => labelForAgent(agent)).join(', '),
+    primaryAgent: facts.primaryAgent || labelForAgent(agents[0] || 'codex'),
+    createdAt: new Date().toISOString().slice(0, 10)
+  };
+}
+
+async function readGeneratedFacts(targetDir) {
+  const content = await readIfExists(path.join(targetDir, 'AGENTS.md'));
+
+  return {
+    projectName: matchLine(content, /^Project:\s*(.+)$/m),
+    primaryAgent: matchLine(content, /^Primary agent:\s*(.+)$/m),
+    projectKind: matchLine(content, /^-\s*Kind:\s*(.+)$/m),
+    stack: matchLine(content, /^-\s*Stack:\s*(.+)$/m),
+    packageManager: matchLine(content, /^-\s*Package manager:\s*(.+)$/m),
+    cavemanMode: matchLine(content, /^-\s*Default caveman mode:\s*(.+)$/m)
+  };
 }
 
 async function initProject(rawArgs) {
@@ -285,11 +369,12 @@ async function confirmOverwrite(rl, conflicts) {
 }
 
 async function copyTemplate(sourceDir, targetDir, values, options) {
-  await renderDirectory(sourceDir, sourceDir, targetDir, values, options);
+  return renderDirectory(sourceDir, sourceDir, targetDir, values, options);
 }
 
 async function renderDirectory(sourceRoot, currentSourceDir, currentTargetDir, values, options) {
   const entries = await readdir(currentSourceDir, { withFileTypes: true });
+  const stats = { written: 0, skipped: 0 };
 
   for (const entry of entries) {
     if (entry.name === '.DS_Store') {
@@ -308,16 +393,22 @@ async function renderDirectory(sourceRoot, currentSourceDir, currentTargetDir, v
 
     if (entry.isDirectory()) {
       await mkdir(targetPath, { recursive: true });
-      await renderDirectory(sourceRoot, sourcePath, targetPath, values, options);
+      const childStats = await renderDirectory(sourceRoot, sourcePath, targetPath, values, options);
+      stats.written += childStats.written;
+      stats.skipped += childStats.skipped;
     } else if (isTextFile(sourcePath)) {
       if (!options.overwrite && await exists(targetPath)) {
+        stats.skipped += 1;
         continue;
       }
 
       const content = await readFile(sourcePath, 'utf8');
       await writeFile(targetPath, render(content, values));
+      stats.written += 1;
     }
   }
+
+  return stats;
 }
 
 function shouldSkipAgentFile(relativePath, agents) {
@@ -349,6 +440,18 @@ async function exists(filePath) {
   }
 }
 
+async function readIfExists(filePath) {
+  try {
+    return await readFile(filePath, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+function matchLine(content, pattern) {
+  return content.match(pattern)?.[1]?.trim() || '';
+}
+
 function slugify(value) {
   return value
     .trim()
@@ -368,6 +471,7 @@ function printHelp() {
 Usage:
   sonata init [project-name] [options]
   sonata retrofit [options]
+  sonata update [options]
 
 Options:
   --description <text>       Project intent
@@ -379,10 +483,12 @@ Options:
   --agents <list>            codex, copilot, claude, or all. Codex always included
   --yes, -y                  Use defaults for missing values
   --force, -f                Overwrite template-managed files in an existing directory
+                             Not supported by update; update never overwrites files
 
 Examples:
   bunx github:gisketch/sonata init
   bunx github:gisketch/sonata init trade-mod
   bunx github:gisketch/sonata retrofit
+  bunx github:gisketch/sonata update
   bunx github:gisketch/sonata init trade-mod --agents all`);
 }

@@ -31,6 +31,13 @@ cd existing-project
 bunx github:gisketch/sonata retrofit
 ```
 
+Refresh a Sonata project with only missing safe files:
+
+```bash
+cd existing-project
+bunx github:gisketch/sonata update
+```
+
 Local development:
 
 ```bash
@@ -41,6 +48,7 @@ npm run check
 ## What This Gives You
 
 - `sonata init`: interactive project generator.
+- `sonata update`: non-breaking refresh that adds missing harness files and never overwrites existing project files.
 - Codex-first setup: generated `AGENTS.md`, `.codex/skills/`, and `.codex/prompts/` are always present.
 - Optional compatibility: Copilot instructions and Claude Code skill files when selected.
 - Generated `AGENTS.md`: short table of contents for agents.
@@ -59,8 +67,9 @@ npm run check
 4. `cd` into the generated folder.
 5. Use `/init-sonata this project is ...` to fill or refine repo context.
 6. Use `/retrofit-sonata` when adapting an existing project or scattered docs into the Sonata standard.
-7. Use `/caveman-sonata add a module that ...` for terse implementation work.
-8. Run `./scripts/check-sonata.sh` before handing the repo to another agent.
+7. Run `sonata update` later to add newly available safe harness files without overwriting local edits.
+8. Use `/caveman-sonata add a module that ...` for terse implementation work.
+9. Run `./scripts/check-sonata.sh` before handing the repo to another agent.
 
 ## Operating Model
 
