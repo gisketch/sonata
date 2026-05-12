@@ -16,4 +16,6 @@ Turn the user's rough project idea into durable context in:
 - `docs/quality.md`
 - `docs/exec-plans/active/` when needed
 
+Capture modularity expectations: small focused files, feature/responsibility slices, and AI-readable entry points.
+
 Keep chat concise. Ask only blocking questions.

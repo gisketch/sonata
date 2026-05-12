@@ -12,6 +12,7 @@ Rules:
 
 - Read `AGENTS.md`, `docs/project-brief.md`, `docs/architecture/index.md`, and `docs/quality.md`.
 - Update `docs/project-brief.md` first.
+- Capture modularity expectations: small focused files, feature/responsibility slices, and AI-readable entry points.
 - Create execution plan for broad work.
 - Run `./scripts/check-sonata.sh`.
 - Respond caveman-terse unless clarity requires normal prose.

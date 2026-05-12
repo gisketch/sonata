@@ -13,6 +13,7 @@ Find:
 - Overgrown always-on instructions.
 - Missing validation commands.
 - Architecture boundaries that should be enforced.
+- Overgrown 500+ line files that should be modularized by feature, responsibility, or interface boundary.
 - Repeated judgment that should become a doc, script, test, or skill.
 
 Findings first. Then compact fix plan.

@@ -13,6 +13,7 @@ Rules:
 - Default mode: {{cavemanMode}}.
 - Read only needed docs from `docs/index.md`.
 - Execution plan first for broad work.
+- Keep code AI-readable: prefer 100-200 line focused files; split 500+ line files by feature, responsibility, or interface boundary unless a clear exception applies.
 - Checks from `docs/quality.md` before handoff.
 - Update docs when behavior or decisions change.
 - Normal prose for safety, destructive ops, or confusion.

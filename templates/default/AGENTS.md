@@ -21,6 +21,7 @@ Codex reads this file first. Keep it short. It is the map, not the manual.
 ## Knowledge Map
 
 - [docs/project-brief.md](docs/project-brief.md): product intent and constraints.
+- [docs/core-beliefs.md](docs/core-beliefs.md): harness philosophy, including small-file modularity.
 - [docs/architecture/index.md](docs/architecture/index.md): structure and boundaries.
 - [docs/quality.md](docs/quality.md): validation commands.
 - [docs/exec-plans/README.md](docs/exec-plans/README.md): planning workflow.

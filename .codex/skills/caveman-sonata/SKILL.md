@@ -13,6 +13,7 @@ Terse like caveman. Harness-aware. Technical meaning exact.
 - Read only needed docs from `docs/index.md`.
 - Never skip harness flow: acceptance, plan when needed, implementation, validation, doc updates.
 - For broad work, create or update execution plan first.
+- Keep code AI-readable: prefer 100-200 line focused files; split 500+ line files by feature, responsibility, or interface boundary unless a clear exception applies.
 - Progress updates: short fragments.
 - Code, commands, paths, errors: exact.
 - Final answer: compact summary plus checks run.

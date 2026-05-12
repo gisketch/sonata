@@ -14,9 +14,10 @@ Turn an existing or messy project into a Sonata-compatible harness without losin
 2. Preserve useful docs by moving, linking, or summarizing into `docs/`.
 3. Keep root `AGENTS.md` short.
 4. Normalize `docs/index.md`, `docs/project-brief.md`, `docs/architecture/index.md`, `docs/quality.md`, and `docs/exec-plans/`.
-5. Keep Codex first; compatibility targets optional.
-6. Do not change app behavior unless explicitly requested.
-7. Run `./scripts/check-sonata.sh` or repo checks from `docs/quality.md`.
+5. Flag oversized 500+ line source files as design smells; plan modular slices instead of broad rewrites.
+6. Keep Codex first; compatibility targets optional.
+7. Do not change app behavior unless explicitly requested.
+8. Run `./scripts/check-sonata.sh` or repo checks from `docs/quality.md`.
 
 ## Output
 

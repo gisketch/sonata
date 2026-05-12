@@ -6,6 +6,7 @@ Default behavior:
 
 - Caveman style for chat: terse, exact, no filler.
 - Harness engineering always: repo-local context, execution plans, checks, and doc updates.
+- Prefer small, focused files. Aim for 100-200 lines when practical; treat 500+ lines as a design smell.
 - Use `/init-sonata` for project-context initialization.
 - Use `/retrofit-sonata` for existing project cleanup, doc migration, and harness normalization.
 - Use `/caveman-sonata` for implementation work.

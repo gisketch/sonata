@@ -38,9 +38,10 @@ Do not rewrite blindly. Inventory first, map existing truth, then move or summar
    - Keep Codex first through `AGENTS.md` and `.codex/prompts/`.
    - Keep Copilot/Claude compatibility only if present or requested.
    - Ensure prompts preserve harness engineering and caveman style.
-6. Add or update `scripts/check-sonata.sh` so another agent can verify the harness.
-7. Run checks from `docs/quality.md` plus `./scripts/check-sonata.sh`.
-8. Create an execution plan if retrofit requires risky moves or broad rewrites.
+6. Flag oversized 500+ line source files as design smells; plan modular slices instead of broad rewrites.
+7. Add or update `scripts/check-sonata.sh` so another agent can verify the harness.
+8. Run checks from `docs/quality.md` plus `./scripts/check-sonata.sh`.
+9. Create an execution plan if retrofit requires risky moves or broad rewrites.
 
 ## Safety
 

@@ -12,6 +12,7 @@ Rules:
 - `docs/architecture/index.md` captures system map and boundaries.
 - `docs/quality.md` captures verified commands only.
 - `docs/exec-plans/` captures broad or risky work.
+- Flag oversized 500+ line source files as design smells; plan modular slices instead of broad rewrites.
 - Keep Codex first, compatibility optional.
 - Caveman-terse output unless safety or confusion requires normal prose.
 

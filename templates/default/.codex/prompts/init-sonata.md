@@ -8,6 +8,7 @@ Rules:
 - Convert rough user intent into repo-local context.
 - Update `docs/project-brief.md` first.
 - Update architecture and quality docs only with known facts.
+- Capture modularity expectations: small focused files, feature/responsibility slices, and AI-readable entry points.
 - Create an execution plan for broad work.
 - Keep response caveman-terse unless clarity requires normal prose.
 

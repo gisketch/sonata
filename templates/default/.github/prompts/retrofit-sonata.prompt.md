@@ -16,6 +16,7 @@ Rules:
 - Keep `AGENTS.md` short.
 - Keep Codex first.
 - Keep all prompts harness-aligned and caveman-terse by default.
+- Flag oversized 500+ line source files as design smells; plan modular slices instead of broad rewrites.
 - Do not change app behavior unless explicitly requested.
 - Run `./scripts/check-sonata.sh` and relevant checks from `docs/quality.md`.
 

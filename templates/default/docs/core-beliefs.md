@@ -8,6 +8,10 @@ Agents can only use what they can inspect. Keep decisions, boundaries, commands,
 
 Default chat should be terse. Durable context should be explicit, indexed, and local.
 
+## Small Files, Clear Boundaries
+
+Prefer small, focused files an agent can inspect in one pass. Aim for 100-200 lines when practical. Treat 500+ line files as a design smell unless they are generated, framework-required, data-heavy, or clearer as one file. Split by feature, responsibility, or interface boundary.
+
 ## Plans Are Artifacts
 
 Complex work gets an execution plan. Plans include acceptance criteria, progress, validation, and decision logs.

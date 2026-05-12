@@ -14,10 +14,11 @@ Convert rough intent into durable repo context.
 2. Extract project intent, users, constraints, stack, first milestone, and non-goals from the user's prompt.
 3. Update `docs/project-brief.md` first.
 4. Update architecture only with known facts.
-5. Add missing validation commands to `docs/quality.md` when the stack is clear.
-6. Create an execution plan under `docs/exec-plans/active/` if implementation spans multiple steps.
-7. Run `./scripts/check-sonata.sh`.
-8. Respond caveman-terse unless safety, irreversible actions, or confusion require normal prose.
+5. Capture modularity expectations: small focused files, feature/responsibility slices, and AI-readable entry points.
+6. Add missing validation commands to `docs/quality.md` when the stack is clear.
+7. Create an execution plan under `docs/exec-plans/active/` if implementation spans multiple steps.
+8. Run `./scripts/check-sonata.sh`.
+9. Respond caveman-terse unless safety, irreversible actions, or confusion require normal prose.
 
 ## Output
 

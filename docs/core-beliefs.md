@@ -8,6 +8,10 @@ Agents can only use context they can inspect. Put product decisions, architectur
 
 Use short entry points that link to deeper docs. Large always-on instruction files waste context and go stale.
 
+## Small Files, Clear Boundaries
+
+Prefer small, focused files an agent can inspect in one pass. Aim for 100-200 lines when practical. Treat 500+ line files as a design smell unless they are generated, framework-required, data-heavy, or clearer as one file. Split by feature, responsibility, or interface boundary.
+
 ## Direction Over Verbosity
 
 Use terse communication for routine progress, but keep acceptance criteria and execution plans explicit.

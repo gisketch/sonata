@@ -16,6 +16,7 @@ Rules:
 - Keep Codex first unless user requests otherwise.
 - Put verified commands in `docs/quality.md`.
 - Put broad/risky work in `docs/exec-plans/active/`.
+- Flag oversized 500+ line source files as design smells; plan modular slices instead of broad rewrites.
 - Run `./scripts/check-sonata.sh`.
 - Caveman-terse output unless safety or confusion requires normal prose.
 
